@@ -52,14 +52,14 @@ services:
       - PGID=1000
       - TZ=Etc/UTC
       - WEBUI_PORT=8080
-      - TORRENTING_PORT=6881
+      - TORRENTING_PORT=23006
     volumes:
       - ${DATA_DIR}/config/bittorrent:/config
       - ${DATA_DIR}/torrents:/data/torrents
     ports:
       - "8080:8080"
-      - "6881:6881"
-      - "6881:6881/udp"
+      - "23006:23006"
+      - "23006:23006/udp"
     restart: unless-stopped
   readarr:
     image: lscr.io/linuxserver/readarr:develop
@@ -74,3 +74,44 @@ services:
     ports:
       - "8787:8787"
     restart: unless-stopped
+  plex:
+    image: lscr.io/linuxserver/plex:latest
+    container_name: plex
+    network_mode: host
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - VERSION=docker
+      - PLEX_CLAIM= #optional
+    volumes:
+      - ${DATA_DIR}/config/plex:/config
+      - ${DATA_DIR}/media:/media
+    restart: unless-stopped
+  unpackerr:
+    image: golift/unpackerr
+    container_name: unpackerr
+    volumes:
+      - ${DATA_DIR}/torrents:/data/torrents
+    restart: always
+    user: 1000:1000
+    environment:
+      - TZ=Etc/UTC
+      # General config
+      - UN_QUIET=false
+      - UN_DEBUG=false
+      - UN_ERROR_STDERR=false
+      - UN_LOG_QUEUES=1m
+      - UN_LOG_FILES=10
+      - UN_LOG_FILE_MB=10
+      - UN_INTERVAL=2m
+      - UN_START_DELAY=1m
+      - UN_RETRY_DELAY=5m
+      - UN_MAX_RETRIES=3
+      - UN_PARALLEL=1
+      - UN_FILE_MODE=0644
+      - UN_DIR_MODE=0755
+      - UN_ACTIVITY=false
+      # Lidarr Config
+      - UN_LIDARR_0_URL=http://lidarr:8686
+      - UN_LIDARR_0_API_KEY=9ae154f7a56e4607ae0e4fa60f1e10fe
