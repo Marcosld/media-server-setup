@@ -93,7 +93,7 @@ services:
     container_name: unpackerr
     volumes:
       - ${DATA_DIR}/torrents:/data/torrents
-    restart: always
+    restart: unless-stopped
     user: 1000:1000
     environment:
       - TZ=Etc/UTC
@@ -115,3 +115,24 @@ services:
       # Lidarr Config
       - UN_LIDARR_0_URL=http://lidarr:8686
       - UN_LIDARR_0_API_KEY=9ae154f7a56e4607ae0e4fa60f1e10fe
+  slskd:
+    image: slskd/slskd:latest
+    container_name: slskd
+    user: 1000:1000
+    restart: unless-stopped
+    environment:
+      - SLSKD_REMOTE_CONFIGURATION=true
+      - SLSKD_SHARED_DIR=/media/music
+      - SLSKD_DOWNLOADS_DIR=/downloads/music
+      - SLSKD_INCOMPLETE_DIR=/downloads/incomplete/music
+      - SLSKD_SLSK_USERNAME=jokepk
+      - SLSKD_SLSK_PASSWORD=123456
+    ports:
+      - "5030:5030/tcp"
+      - "5031:5031/tcp"
+      - "50300:50300/tcp"
+    volumes:
+      - ${DATA_DIR}/config/slskd:/app:rw
+      - ${DATA_DIR}/media/music:/media/music:r
+      - ${DATA_DIR}/torrents/music:/downloads/music:rw
+      - ${DATA_DIR}/torrents/incomplete/music:/downloads/incomplete/music:rw
