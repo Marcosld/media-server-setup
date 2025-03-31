@@ -8,6 +8,7 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=Etc/UTC
+      - SUBFOLDER=/calibre # /calibre will work, /calibre/ will not
     volumes:
       - ${DATA_DIR}/config/calibre:/config
       - ${DATA_DIR}/media/books:/data/media/books
@@ -152,3 +153,11 @@ services:
       - net.ipv4.conf.all.src_valid_mark=1
     volumes:
       - ${DATA_DIR}/config/cloudflare-warp:/var/lib/cloudflare-warp
+  nginx:
+    image: nginx
+    volumes:
+      - ${DATA_DIR}/config/nginx:/etc/nginx/templates
+    ports:
+      - "80:80"
+    environment:
+      - NGINX_PORT=80
